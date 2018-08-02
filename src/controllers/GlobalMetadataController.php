@@ -118,37 +118,20 @@ class GlobalMetadataController extends Controller
     {
         $this->requirePostRequest();
 
-        $postData = Craft::$app->getRequest()->getBodyParam('sproutseo.globals');
-        $globalKeys = Craft::$app->getRequest()->getBodyParam('globalKeys');
         $siteId = Craft::$app->getRequest()->getBodyParam('siteId');
 
-        $addressInfoId = SproutBase::$app->addressField->saveAddressByPost();
+        // @todo - move saving the address to the database transaction try/catch block
+//        $addressInfoId = SproutBase::$app->addressField->saveAddressByPost();
+//
+//        if ($addressInfoId) {
+//            $postData['identity']['addressId'] = $addressInfoId;
+//        }
 
-        if ($addressInfoId) {
-            $postData['identity']['addressId'] = $addressInfoId;
-        }
+//        if (isset($postData['identity']['foundingDate'])) {
+//            $postData['identity']['foundingDate'] = DateTimeHelper::toDateTime($postData['identity']['foundingDate']);
+//        }
 
-        $globalKeys = explode(',', $globalKeys);
-
-        if (isset($postData['identity']['foundingDate'])) {
-            $postData['identity']['foundingDate'] = DateTimeHelper::toDateTime($postData['identity']['foundingDate']);
-        }
-
-        $globals = new Globals($postData);
-        $globals->siteId = $siteId;
-
-        $globalMetadata = $this->populateGlobalMetadata($postData);
-
-        $globals->meta = $globalMetadata;
-
-        $identity = $globals->identity;
-
-        if (isset($identity['@type']) && $identity['@type'] === 'Person') {
-            // Clean up our organization subtypes when the Person type is selected
-            unset($identity['organizationSubTypes']);
-
-            $globals->identity = $identity;
-        }
+        $globals = $this->populateGlobalsModel($siteId);
 
         if (!SproutSeo::$app->globalMetadata->saveGlobalMetadata($globalKeys, $globals)) {
             Craft::$app->getSession()->setError(Craft::t('sprout-seo', 'Unable to save globals.'));
@@ -178,7 +161,7 @@ class GlobalMetadataController extends Controller
         $this->requirePostRequest();
 
         $ownershipMeta = Craft::$app->getRequest()->getBodyParam('sproutseo.meta.ownership');
-        $globalKeys = 'ownership';
+//        $globalKeys = 'ownership';
         $siteId = Craft::$app->getRequest()->getBodyParam('siteId');
 
         // Remove empty items from multi-dimensional array
@@ -210,6 +193,34 @@ class GlobalMetadataController extends Controller
         Craft::$app->getSession()->setNotice(Craft::t('sprout-seo', 'Globals saved.'));
 
         return $this->redirectToPostedUrl($globals);
+    }
+
+    public function populateGlobalsModel($siteId)
+    {
+        $globals = new Globals();
+        $globals->siteId = $siteId;
+
+        // Modify any submitted values that need modified
+
+
+        // Assign submitted values to Globals model
+
+
+        // Build Metadata Model
+
+
+//        $globalMetadata = $this->populateGlobalMetadata($postData);
+//
+//        $globals->meta = $globalMetadata;
+//
+//        $identity = $globals->identity;
+//
+//        if (isset($identity['@type']) && $identity['@type'] === 'Person') {
+//            // Clean up our organization subtypes when the Person type is selected
+//            unset($identity['organizationSubTypes']);
+//
+//            $globals->identity = $identity;
+//        }
     }
 
     /**

@@ -25,39 +25,9 @@ class Globals extends Model
     public $siteId;
 
     /**
-     * @var array
+     * @var string
      */
-    public $meta;
-
-    /**
-     * @var array
-     */
-    public $identity;
-
-    /**
-     * @var array
-     */
-    public $ownership;
-
-    /**
-     * @var array
-     */
-    public $contacts;
-
-    /**
-     * @var array
-     */
-    public $social;
-
-    /**
-     * @var array
-     */
-    public $robots;
-
-    /**
-     * @var array
-     */
-    public $settings;
+    public $everything;
 
     /**
      * @var \DateTime
@@ -75,67 +45,28 @@ class Globals extends Model
     public $uid;
 
     /**
-     * @var string
-     */
-    public $globalKey;
-
-    /**
      * @var Address|null
      */
     public $addressModel = null;
 
     public function init()
     {
-        if (isset($this->identity['addressId']) && $this->addressModel === null) {
-            $this->addressModel = SproutBase::$app->addressField->getAddressById($this->identity['addressId']);
-        }
-    }
-    /**
-     * Factory to return schema of any type
-     *
-     * @param string $target
-     * @param string $format
-     *
-     * @return array|string
-     */
-    public function getGlobalByKey($target, $format = 'array')
-    {
-        if ($target) {
-            $this->globalKey = $target;
-        }
-
-        $targetMethod = 'get'.ucfirst($target);
-
-        $schema = $this->{$targetMethod}();
-
-        if ($format === 'json') {
-            return Json::encode($schema);
-        }
-
-        return $schema;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getWebsiteIdentityType()
-    {
-        $this->getGlobalByKey('identity');
-        $identityType = 'Organization';
-
-        if (isset($this->identity['@type']) && $this->identity['@type'] != '') {
-            $identityType = $this->identity['@type'];
-        }
-
-        return $identityType;
+//        if (isset($this->identity['addressId']) && $this->addressModel === null) {
+//            $this->addressModel = SproutBase::$app->addressField->getAddressById($this->identity['addressId']);
+//        }
     }
 
     /**
      * @return array
      */
-    protected function getMeta()
+    protected function getMetadata()
     {
-        return $this->meta;
+        // Mass assign
+        $metadata = new Metadata();
+        $metadata->siteId = $this->siteId;
+        $metadata->setAttributes($this->everything, false);
+
+        return new Metadata($this);
     }
 
     /**
@@ -145,7 +76,10 @@ class Globals extends Model
      */
     protected function getIdentity()
     {
-        return $this->{$this->globalKey};
+        $globalsIdentity = new GlobalsIdentity();
+        $globalsIdentity->setAttributes($this->everything, false);
+
+        return $globalsIdentity;
     }
 
     /**
@@ -229,6 +163,24 @@ class Globals extends Model
     protected function getSettings()
     {
         return $this->{$this->globalKey};
+    }
+
+
+
+
+    /**
+     * @return null|string
+     */
+    public function getWebsiteIdentityType()
+    {
+        $this->getGlobalByKey('identity');
+        $identityType = 'Organization';
+
+        if (isset($this->identity['@type']) && $this->identity['@type'] != '') {
+            $identityType = $this->identity['@type'];
+        }
+
+        return $identityType;
     }
 
     /**

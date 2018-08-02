@@ -90,13 +90,13 @@ class GlobalMetadata extends Component
      */
     public function saveGlobalMetadata($globalKeys, $globals)
     {
-        if (!is_array($globalKeys)) {
-            [$globalKeys];
-        }
-
-        foreach ($globalKeys as $globalKey) {
-            $values[$globalKey] = $globals->getGlobalByKey($globalKey, 'json');
-        }
+//        if (!is_array($globalKeys)) {
+//            [$globalKeys];
+//        }
+//
+//        foreach ($globalKeys as $globalKey) {
+//            $values[$globalKey] = $globals->getGlobalByKey($globalKey, 'json');
+//        }
         $values['siteId'] = $globals->siteId;
         // new site?
         $results = (new Query())
